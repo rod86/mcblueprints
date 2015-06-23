@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        <a href="#" class="thumbnail">
+            <img src="/img/content/sample.png">
+        </a>
+    </div>
+    <div class="col-xs-12 col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <dl class="dl-horizontal">
+                    <dt>Author</dt>
+                    <dd>{{blueprint.user.username}}</dd>
+                    <dt>Date</dt>
+                    <dd>{{blueprint.createdAt|date:'dd/MM/yyyy H:mm'}}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2>Description</h2>
+<br/>
+<p>
+    {{blueprint.description}}
+</p>
+<br/>
+<a href="#" class="btn btn-primary btn-lg" role="button">Download</a>

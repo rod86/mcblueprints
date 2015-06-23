@@ -1,0 +1,16 @@
+<h2>Latest Blueprints</h2>
+<br/>
+<div class="blueprints-list">
+    <div class="row item" ng-repeat="blueprint in blueprints">
+        <div class="col-xs-12 col-md-2">
+            <a ng-href="/blueprint/view/{{blueprint._id}}" class="thumbnail">
+                <img src="/img/content/sample.png">
+            </a>
+        </div>
+        <div class="col-xs-12 col-md-10">
+            <h3>{{blueprint.title}}</h3>
+            <small>By <b>{{blueprint.user.username}}</b></small> - <small><i>{{blueprint.createdAt|date:'dd/MM/yyyy H:mm'}}</i></small>
+            <a class="btn btn-default pull-right" ng-href="/blueprint/view/{{blueprint._id}}" role="button">View</a>
+        </div>
+    </div>
+</div>
