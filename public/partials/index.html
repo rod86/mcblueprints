@@ -3,8 +3,8 @@
 <div class="blueprints-list">
     <div class="row item" ng-repeat="blueprint in blueprints">
         <div class="col-xs-12 col-md-2">
-            <a ng-href="/blueprint/view/{{blueprint._id}}" class="thumbnail">
-                <img src="/img/content/sample.png">
+            <a ng-href="/blueprint/view/{{blueprint._id}}" class="thumbnail" ng-if="blueprint.images.length">
+                <img ng-src="/uploads/blueprints/{{blueprint._id}}/{{blueprint.images[0].filename}}">
             </a>
         </div>
         <div class="col-xs-12 col-md-10">

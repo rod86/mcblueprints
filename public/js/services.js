@@ -54,6 +54,9 @@ angular.module('Blueprints.services', [])
             },
             deleteBlueprint: function(id) {
                 return $http.delete('/api/blueprints/'+id);
+            },
+            deleteBlueprintImage: function(id, imageId) {
+                return $http.get('/api/blueprints/'+id+'/delete-image/'+imageId);
             }
         };
     }])

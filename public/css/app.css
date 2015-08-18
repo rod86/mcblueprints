@@ -35,3 +35,33 @@ table .thumbnail {
 .blueprints-list .item .thumbnail {
     margin-bottom: 0;
 }
+
+/* Drag & Drop image uploads */
+.dropzone {
+    background: #F8F8F8;
+    border: 3px dashed #DDD;
+    text-align: center;
+    padding: 10px 0;
+    margin-bottom: 15px;
+}
+.dragover {
+    border: 3px dashed #333;
+}
+
+.fileList {
+    margin: 5px 0;
+}
+.fileList .thumbnail {
+    border: none;
+    border-radius: 0;
+}
+.fileList .caption {
+    background-color: #f4f4f4;
+}
+.fileList .caption .title {
+    margin-bottom: 8px;
+}
+.fileList .item img {
+    width: 162px;
+    height: 91px;
+}

@@ -1,6 +1,9 @@
 var express = require('express'),
     router = express.Router(),
     mongoose = require('mongoose'),
+    fs = require('fs'),
+    Upload = require('../lib/upload.js'),
+    fnc = require('../lib/functions.js'),
     Blueprint = require('../models/blueprint.js'),
     User = require('../models/user.js');
 
@@ -48,7 +51,7 @@ router.post('/users', function(request, response) {
     });
 });
 
-router.put('/users/:id', function(request, response) {
+router.put('/users/:id', fnc.checkSession, function(request, response) {
     var id = request.params.id,
         username = request.body.username,
         email = request.body.email;
@@ -72,7 +75,7 @@ router.put('/users/:id', function(request, response) {
     });
 });
 
-router.put('/users/:id/password', function(request, response) {
+router.put('/users/:id/password', fnc.checkSession, function(request, response) {
     var id = request.params.id,
         oldPassword = request.body.oldpassword,
         password = request.body.password;
@@ -107,7 +110,7 @@ router.put('/users/:id/password', function(request, response) {
     });
 });
 
-router.delete('/users/:id', function(request, response) {
+router.delete('/users/:id', fnc.checkSession, function(request, response) {
     var id = request.params.id;
 
     User.findByIdAndRemove(id, function(err){
@@ -192,35 +195,39 @@ router.get('/blueprints/:id', function(request, response) {
     }).populate('user', 'username');
 });
 
-router.post('/blueprints', function(request, response){
+router.post('/blueprints', fnc.checkSession, function(request, response){
     var user = mongoose.Types.ObjectId(request.body.user),
         title = request.body.title,
-        description = request.body.description;
+        description = request.body.description,
+        downloadUrl = request.body.downloadUrl;
 
     var  blueprint = new Blueprint({
         title: title,
         description: description,
-        user: user
+        user: user,
+        downloadUrl: downloadUrl
     });
 
     blueprint.save(function(err){
         if (!err) {
-            return response.json({status:'ok'});
+            return response.json({status:'ok', id: blueprint._id});
         } else {
             return response.json({status:'error', message: err});
         }
     });
 });
 
-router.put('/blueprints/:id', function(request, response){
+router.put('/blueprints/:id', fnc.checkSession, function(request, response){
     var id = request.params.id,
         title = request.body.title,
-        description = request.body.description;
+        description = request.body.description,
+        downloadUrl = request.body.downloadUrl;
 
     var data = {
         title: title,
         description: description,
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        downloadUrl: downloadUrl
     };
 
     Blueprint.update({_id: id}, {$set: data}, function(err){
@@ -232,7 +239,7 @@ router.put('/blueprints/:id', function(request, response){
     });
 });
 
-router.delete('/blueprints/:id', function(request, response) {
+router.delete('/blueprints/:id', fnc.checkSession, function(request, response) {
     var id = request.params.id;
 
     Blueprint.findByIdAndRemove(id, function(err){
@@ -241,6 +248,70 @@ router.delete('/blueprints/:id', function(request, response) {
         } else {
             return response.json({status:'error', message: err});
         }
+    });
+});
+
+router.post('/blueprints/:id/add-image', fnc.checkSession, function(request, response) {
+    var id = request.params.id;
+
+    if (request.files) {
+        if (request.files.file.size === 0) {
+            return response.status(500).send('No file was uploaded');
+        }
+
+        var upload = new Upload();
+        upload.setAllowedExtensions(['.png', '.gif', '.jpg', '.jpeg']);
+        upload.setDestination('blueprints/'+id);
+        upload.setOverwrite(false);
+        upload.setCreatePath(true);
+        upload.setFile(request.files.file.path);
+        upload.move(function(err, filename){
+            if (err!=null) {
+                return response.json({status:'error', message: err});
+            } else {
+                Blueprint.findOne({_id: id}, {}, function(err, blueprint) {
+                    if (err) {
+                        return response.json({status: 'error', message: err});
+                    } else if (blueprint==null) {
+                        return response.json({status: 'error', message: 'Item not found'});
+                    }
+
+                    blueprint.appendImage(filename, function(err, imageId){
+                        if (err)
+                            return response.json({status:'error', message: err});
+
+                        var file = {
+                            _id: imageId,
+                            filename: filename
+                        };
+
+                        return response.json({status:'ok', file: file});
+                    });
+                });
+            }
+        });
+    }
+});
+
+router.get('/blueprints/:id/delete-image/:imageId', fnc.checkSession, function(request, response) {
+    var id = request.params.id,
+        imageId = request.params.imageId;
+
+    Blueprint.findOne({_id: id}, {}, function(err, blueprint) {
+        var file = blueprint.images.id(imageId);
+        blueprint.images.pull(imageId);
+        blueprint.save(function(err){
+            if (err)
+                return response.json({status: 'error', message: err});
+
+            var path = './public/uploads/blueprints/' + id + '/' + file.filename;
+            fs.unlink(path, function(err){
+                if (err)
+                    return response.json({status: 'error', message: err});
+
+                return response.json({status:'ok'});
+            });
+        });
     });
 });
 

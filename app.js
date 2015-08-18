@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var multer = require('multer');
 
 var routes = require('./app/routes/routes');
 var api = require('./app/routes/api');
@@ -15,10 +16,6 @@ var app = express();
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/blueprints');
 var db = mongoose.connection;
-
-// view engine setup
-app.set('views', path.join(__dirname, 'app/views'));
-app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -31,6 +28,12 @@ app.use(session({
     secret: 'secretword',
     saveUninitialized: false,
     resave: false
+}));
+app.use(multer({
+    dest: './tmp/',
+    rename: function (fieldname, filename) {
+        return filename.replace(/\W+/g, '-').toLowerCase();
+    }
 }));
 
 app.use('/api', api);

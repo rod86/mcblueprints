@@ -74,9 +74,6 @@ angular.module('Blueprints.controllers', [])
             }
         );
 
-
-        $scope.items = ['item1', 'item2', 'item3'];
-
         $scope.remove = function (index) {
             var id = $scope.blueprints[index]._id;
 
@@ -104,8 +101,8 @@ angular.module('Blueprints.controllers', [])
             });
         };
     }])
-    .controller('BlueprintAddCtrl', ['$scope', 'blueprintsFactory', '$rootScope', function($scope, blueprintsFactory, $rootScope) {
-        $scope.buttonText = 'Add';
+    .controller('BlueprintAddCtrl', ['$scope', 'blueprintsFactory', '$rootScope', '$location', function($scope, blueprintsFactory, $rootScope, $location) {
+        $scope.isCreate = true;
 
         $scope.submitForm = function(form) {
             $scope.submitted = true;
@@ -114,11 +111,13 @@ angular.module('Blueprints.controllers', [])
                 $scope.alert = null;
                 var data = $scope.blueprint;
                 data.user = $rootScope.user.id;
+                data.images = $scope.images;
+                console.log($scope.images);
 
                 blueprintsFactory.addBlueprint(data).then(
                     function (response) {
                         if (response.data.status == 'ok') {
-                            $scope.alert = {type: 'success', message: 'Blueprint added'};
+                           $location.path('/my-blueprints/edit/' + response.data.id);
                         } else {
                             if (response.data.message)
                                 $scope.alert = {type: 'danger', message: response.data.message};
@@ -133,14 +132,16 @@ angular.module('Blueprints.controllers', [])
             }
         };
     }])
-    .controller('BlueprintEditCtrl', ['$scope', 'blueprintsFactory', '$routeParams', function($scope, blueprintsFactory, $routeParams) {
+    .controller('BlueprintEditCtrl', ['$scope', 'blueprintsFactory', '$routeParams', 'Upload', function($scope, blueprintsFactory, $routeParams, Upload) {
         var id = $routeParams.id;
         $scope.blueprint = null;
-        $scope.buttonText = 'Update';
+        $scope.isCreate = false;
+        $scope.images = [];
 
         blueprintsFactory.getBlueprint(id).then(
             function (response) {
                 $scope.blueprint = response.data.blueprint;
+                $scope.images    = response.data.blueprint.images;
             },
             function (err) {
                 console.log(err);
@@ -169,6 +170,41 @@ angular.module('Blueprints.controllers', [])
                 );
             } else {
                 $scope.alert = {type: 'danger', message: 'Form is invalid. Please, check errors.'};
+            }
+        };
+
+        $scope.$watch('files', function () {
+            $scope.upload($scope.files);
+        });
+
+        $scope.removeFile = function(file) {
+            blueprintsFactory.deleteBlueprintImage(id, file._id).then(
+                function (response) {
+                    if (response.data.status == 'ok') {
+                        var index = $scope.images.indexOf(file);
+                        $scope.images.splice(index, 1);
+                    } else {
+                        if (response.data.message)
+                            $scope.alert = {type: 'danger', message: response.data.message};
+                    }
+                },
+                function (error) {
+                    console.log(error);
+                }
+            );
+        };
+
+        $scope.upload = function (files) {
+            if (files && files.length) {
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    Upload.upload({
+                        url: '/api/blueprints/'+id+'/add-image',
+                        file: file
+                    }).success(function (data, status, headers, config) {
+                        $scope.images.push(data.file);
+                    });
+                }
             }
         };
     }])

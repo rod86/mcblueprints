@@ -9,7 +9,8 @@ angular.module('Blueprints', [
   'Blueprints.directives',
   'Blueprints.controllers',
   'ngCookies',
-  'ui.bootstrap'
+  'ui.bootstrap',
+  'ngFileUpload'
 ])
     .config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
         $routeProvider.when('/blueprint/view/:id', {

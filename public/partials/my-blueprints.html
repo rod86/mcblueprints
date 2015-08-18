@@ -14,8 +14,8 @@
     <tbody>
         <tr ng-repeat="blueprint in blueprints">
             <td>
-                <a ng-href="/my-blueprints/edit/{{blueprint._id}}" class="thumbnail">
-                    <img src="/img/content/sample.png">
+                <a ng-href="/my-blueprints/edit/{{blueprint._id}}" class="thumbnail" ng-if="blueprint.images.length">
+                    <img ng-src="/uploads/blueprints/{{blueprint._id}}/{{blueprint.images[0].filename}}">
                 </a>
             </td>
             <td>{{blueprint.title}}</td>
