@@ -1,2 +1,5 @@
 .idea
 .DS_Store
+public/uploads/blueprints
+!public/uploads/blueprints/.gitkeep
+npm-debug.log
