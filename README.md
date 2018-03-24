@@ -1,7 +1,8 @@
 mcblueprints
 =============
 
-Site to manage and share Minecraft structures built in MEAN stack.
+Site to manage and share Minecraft structures. 
+This application has been built with MEAN stack (MongoDB, Express, AngularJS 1.x, NodeJs).
 
 ## Setup
 
