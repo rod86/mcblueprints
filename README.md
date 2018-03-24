@@ -1,4 +1,4 @@
-symfony-forum
+mcblueprints
 =============
 
 Site to manage and share Minecraft structures built in MEAN stack.
