@@ -1,5 +1,6 @@
 .idea
 .DS_Store
+node_modules
 public/uploads/blueprints
 !public/uploads/blueprints/.gitkeep
 npm-debug.log

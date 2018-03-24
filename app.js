@@ -14,7 +14,12 @@ var app = express();
 
 // Mongoose Setup
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/blueprints');
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/blueprints', {
+    useMongoClient: true
+})
+    .then(() => console.log('MongoDB Connected...'))
+    .catch(err => console.log(err));
 var db = mongoose.connection;
 
 // uncomment after placing your favicon in /public
