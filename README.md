@@ -1,4 +1,4 @@
-mcblueprints
+MC Blueprints
 =============
 
 Site to manage and share Minecraft structures.
